@@ -49,11 +49,15 @@ func renderExample(writer io.Writer, ex *doc.Example) {
 }
 
 func renderTypeSectionTo(writer io.Writer, list []*doc.Type, examples map[string][]*doc.Example) {
-
 	header := RenderStyle.TypeHeader
 
 	for _, entry := range list {
 		fmt.Fprintf(writer, "%s type %s\n\n%s\n\n%s\n", header, entry.Name, indentCode(sourceOfNode(entry.Decl)), formatIndent(filterText(entry.Doc)))
+
+		for _, ex := range examples[entry.Name] {
+			renderExample(writer, ex)
+		}
+
 		renderConstantSectionTo(writer, entry.Consts)
 		renderVariableSectionTo(writer, entry.Vars)
 		renderFunctionSectionTo(writer, entry.Funcs, true, examples)
