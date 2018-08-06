@@ -118,7 +118,7 @@ import (
 
 const (
 	punchCardWidth = 80
-	debug          = true
+	debug          = false
 )
 
 var (

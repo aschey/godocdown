@@ -19,7 +19,7 @@ func renderVariableSectionTo(writer io.Writer, list []*doc.Value) {
 	}
 }
 
-func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection bool) {
+func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection bool, examples map[string]*doc.Example) {
 
 	header := RenderStyle.FunctionHeader
 	if inTypeSection {
@@ -37,6 +37,14 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 			entry.Name,
 			indentCode(sourceOfNode(entry.Decl)),
 			formatIndent(filterText(entry.Doc)))
+
+		if examples != nil {
+			ex := examples[entry.Name]
+			code := sourceOfNode(ex.Code)
+			code = indentCode(code[2:len(code)-2])
+
+			fmt.Fprintf(writer, "Example:\n%s\n\nOutput:\n```\n%s```\n\n", code, ex.Output)
+		}
 	}
 }
 
@@ -48,8 +56,8 @@ func renderTypeSectionTo(writer io.Writer, list []*doc.Type) {
 		fmt.Fprintf(writer, "%s type %s\n\n%s\n\n%s\n", header, entry.Name, indentCode(sourceOfNode(entry.Decl)), formatIndent(filterText(entry.Doc)))
 		renderConstantSectionTo(writer, entry.Consts)
 		renderVariableSectionTo(writer, entry.Vars)
-		renderFunctionSectionTo(writer, entry.Funcs, true)
-		renderFunctionSectionTo(writer, entry.Methods, true)
+		renderFunctionSectionTo(writer, entry.Funcs, true, nil)
+		renderFunctionSectionTo(writer, entry.Methods, true, nil)
 	}
 }
 
@@ -72,10 +80,17 @@ func renderSynopsisTo(writer io.Writer, document *_document) {
 
 func renderUsageTo(writer io.Writer, document *_document) {
 
-	for k, f := range document.testFiles {
-		examples := doc.Examples(f)
-		fmt.Println("K IS", k)
-		fmt.Println("E IS", examples)
+	examples := map[string]*doc.Example{}
+	for _, f := range document.testFiles {
+		for _, e := range doc.Examples(f) {
+			examples[e.Name] = e
+			// fmt.Println("F IS", k)
+			// fmt.Println("E IS", e)
+			// fmt.Println("E.Name", e.Name)
+			// fmt.Println("E.Output", e.Output)
+			// fmt.Println("E.Doc", e.Doc)
+			// fmt.Printf("E.Code %s\n", sourceOfNode(e.Code))
+		}
 	}
 
 	// examples := []*doc.Example{}
@@ -99,7 +114,7 @@ func renderUsageTo(writer io.Writer, document *_document) {
 	renderVariableSectionTo(writer, document.pkg.Vars)
 
 	// Function Section
-	renderFunctionSectionTo(writer, document.pkg.Funcs, false)
+	renderFunctionSectionTo(writer, document.pkg.Funcs, false, examples)
 
 	// Type Section
 	renderTypeSectionTo(writer, document.pkg.Types)
