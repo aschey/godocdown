@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"go/doc"
 	"io"
-	// "strings"
+	"strings"
 )
 
 func renderConstantSectionTo(writer io.Writer, list []*doc.Value) {
@@ -19,7 +19,7 @@ func renderVariableSectionTo(writer io.Writer, list []*doc.Value) {
 	}
 }
 
-func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection bool, examples map[string]*doc.Example) {
+func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection bool, examples map[string][]*doc.Example) {
 
 	header := RenderStyle.FunctionHeader
 	if inTypeSection {
@@ -39,8 +39,7 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 			formatIndent(filterText(entry.Doc)))
 
 		if examples != nil {
-			ex := examples[entry.Name]
-			if ex != nil {
+			for _, ex := range examples[entry.Name] {
 				code := sourceOfNode(ex.Code)
 				code = indentCode(code[2:len(code)-2])
 
@@ -82,29 +81,13 @@ func renderSynopsisTo(writer io.Writer, document *_document) {
 
 func renderUsageTo(writer io.Writer, document *_document) {
 
-	examples := map[string]*doc.Example{}
+	examples := map[string][]*doc.Example{}
 	for _, f := range document.testFiles {
 		for _, e := range doc.Examples(f) {
-			examples[e.Name] = e
-			// fmt.Println("F IS", k)
-			// fmt.Println("E IS", e)
-			// fmt.Println("E.Name", e.Name)
-			// fmt.Println("E.Output", e.Output)
-			// fmt.Println("E.Doc", e.Doc)
-			// fmt.Printf("E.Code %s\n", sourceOfNode(e.Code))
+			root := strings.SplitN(e.Name, "_", 2)[0]
+			examples[root] = append(examples[root], e)
 		}
 	}
-
-	// examples := []*doc.Example{}
-	// for k, astFile := range document.astPkg.Files {
-	// 	fmt.Println("K=", k)
-	// 	if !strings.HasSuffix(k, "_test.go") {
-	// 		continue
-	// 	}
-	//
-	// 	examples := doc.Examples(astFile)
-	// 	fmt.Println("ROI", examples)
-	// }
 
 	// Usage
 	fmt.Fprintf(writer, "%s\n", RenderStyle.UsageHeader)
