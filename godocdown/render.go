@@ -40,6 +40,17 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 
 		if examples != nil {
 			for _, ex := range examples[entry.Name] {
+				if ex.Play != nil {
+					// skip examples that has a whole program version of the
+					// example. this will happen when the Example can't be
+					// compiled nicely into a code snippet and output, and
+					// instead is given as a full program. In markdown, because
+					// we can't collapse the examples, it would result in a very
+					// verbose and unreadable code segment. For now, we're not
+					// supporting it.
+					continue
+				}
+
 				code := sourceOfNode(ex.Code)
 				code = indentCode(code[2:len(code)-2])
 
