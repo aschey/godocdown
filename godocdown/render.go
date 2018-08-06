@@ -40,10 +40,12 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 
 		if examples != nil {
 			ex := examples[entry.Name]
-			code := sourceOfNode(ex.Code)
-			code = indentCode(code[2:len(code)-2])
+			if ex != nil {
+				code := sourceOfNode(ex.Code)
+				code = indentCode(code[2:len(code)-2])
 
-			fmt.Fprintf(writer, "Example:\n%s\n\nOutput:\n```\n%s```\n\n", code, ex.Output)
+				fmt.Fprintf(writer, "Example:\n%s\n\nOutput:\n```\n%s```\n\n", code, ex.Output)
+			}
 		}
 	}
 }
