@@ -31,33 +31,20 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 		if entry.Recv != "" {
 			receiver = fmt.Sprintf("(%s) ", entry.Recv)
 		}
-		fmt.Fprintf(writer, "%s func %s%s\n\n%s\n%s\n",
-			header,
-			receiver,
-			entry.Name,
-			indentCode(sourceOfNode(entry.Decl)),
-			formatIndent(filterText(entry.Doc)))
+		fmt.Fprintf(writer, "%s func %s%s\n\n%s\n%s\n", header, receiver, entry.Name, indentCode(sourceOfNode(entry.Decl)), formatIndent(filterText(entry.Doc)))
 
 		if examples != nil {
 			for _, ex := range examples[entry.Name] {
-				if ex.Play != nil {
-					// skip examples that has a whole program version of the
-					// example. this will happen when the Example can't be
-					// compiled nicely into a code snippet and output, and
-					// instead is given as a full program. In markdown, because
-					// we can't collapse the examples, it would result in a very
-					// verbose and unreadable code segment. For now, we're not
-					// supporting it.
-					continue
-				}
-
-				code := sourceOfNode(ex.Code)
-				code = indentCode(code[2:len(code)-2])
-
-				fmt.Fprintf(writer, "Example:\n%s\n\nOutput:\n```\n%s```\n\n", code, ex.Output)
+				renderExample(writer, ex)
 			}
 		}
 	}
+}
+
+func renderExample(writer io.Writer, ex *doc.Example) {
+	code := sourceOfNode(ex.Code)
+	code = indentCode(code)
+	fmt.Fprintf(writer, "<details><summary>Example</summary><p>\n%s\n\nOutput:\n```\n%s```\n</p></details>\n", code, ex.Output)
 }
 
 func renderTypeSectionTo(writer io.Writer, list []*doc.Type) {
