@@ -48,7 +48,7 @@ func renderExample(writer io.Writer, ex *doc.Example) {
 	fmt.Fprintf(writer, "<details><summary>Example</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n\n", formatIndent(filterText(ex.Doc)), code, ex.Output)
 }
 
-func renderTypeSectionTo(writer io.Writer, list []*doc.Type) {
+func renderTypeSectionTo(writer io.Writer, list []*doc.Type, examples map[string][]*doc.Example) {
 
 	header := RenderStyle.TypeHeader
 
@@ -56,7 +56,7 @@ func renderTypeSectionTo(writer io.Writer, list []*doc.Type) {
 		fmt.Fprintf(writer, "%s type %s\n\n%s\n\n%s\n", header, entry.Name, indentCode(sourceOfNode(entry.Decl)), formatIndent(filterText(entry.Doc)))
 		renderConstantSectionTo(writer, entry.Consts)
 		renderVariableSectionTo(writer, entry.Vars)
-		renderFunctionSectionTo(writer, entry.Funcs, true, nil)
+		renderFunctionSectionTo(writer, entry.Funcs, true, examples)
 		renderFunctionSectionTo(writer, entry.Methods, true, nil)
 	}
 }
@@ -101,7 +101,7 @@ func renderUsageTo(writer io.Writer, document *_document) {
 	renderFunctionSectionTo(writer, document.pkg.Funcs, false, examples)
 
 	// Type Section
-	renderTypeSectionTo(writer, document.pkg.Types)
+	renderTypeSectionTo(writer, document.pkg.Types, examples)
 }
 
 func renderSignatureTo(writer io.Writer) {
