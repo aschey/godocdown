@@ -44,7 +44,7 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 func renderExample(writer io.Writer, ex *doc.Example) {
 	code := sourceOfNode(ex.Code)
 	code = indentCode(code)
-	fmt.Fprintf(writer, "<details><summary>Example</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n", formatIndent(filterText(ex.Doc)), code, ex.Output)
+	fmt.Fprintf(writer, "<details><summary>Example</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n\n", formatIndent(filterText(ex.Doc)), code, ex.Output)
 }
 
 func renderTypeSectionTo(writer io.Writer, list []*doc.Type) {
