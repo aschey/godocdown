@@ -3,7 +3,7 @@
 Command godocdown generates Go documentation in a GitHub-friendly Markdown
 format.
 
-    $ go get github.com/robertkrimen/godocdown/godocdown
+    $ go get github.com/avinoamr/godocdown/godocdown
 
     $ godocdown /path/to/package > README.markdown
 
@@ -20,12 +20,12 @@ changed with the use of the "plain" flag to generate standard Markdown.
 
 ### Install
 
-    go get github.com/robertkrimen/godocdown/godocdown
+    go get github.com/avinoamr/godocdown/godocdown
 
 
 ### Example
 
-http://github.com/robertkrimen/godocdown/blob/master/example.markdown
+http://github.com/avinoamr/godocdown/blob/master/example.markdown
 
 ### Usage
 
@@ -104,4 +104,4 @@ the following interface:
     // (This field will be the empty string if godocdown is unable to guess it)
 
 --
-**godocdown** http://github.com/robertkrimen/godocdown
+**godocdown** http://github.com/avinoamr/godocdown

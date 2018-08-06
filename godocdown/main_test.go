@@ -28,15 +28,15 @@ func testImportPath(target, want string) {
 func TestGuessImportPath(t *testing.T) {
 	Terst(t)
 
-	testImportPath("./example", "github.com/robertkrimen/godocdown/godocdown/example")
-	testImportPath("../example", "github.com/robertkrimen/godocdown/example")
+	testImportPath("./example", "github.com/avinoamr/godocdown/godocdown/example")
+	testImportPath("../example", "github.com/avinoamr/godocdown/example")
 	if filepath.Separator == '/' {
 		// This test does not work well on windows
 		testImportPath("/not/in/GOfromSlash", "")
 	}
-	testImportPath("in/GOfromSlash", "github.com/robertkrimen/godocdown/godocdown/in/GOfromSlash")
-	testImportPath(".", "github.com/robertkrimen/godocdown/godocdown")
-	testImportPath("../example/example", "github.com/robertkrimen/godocdown/example/example")
+	testImportPath("in/GOfromSlash", "github.com/avinoamr/godocdown/godocdown/in/GOfromSlash")
+	testImportPath(".", "github.com/avinoamr/godocdown/godocdown")
+	testImportPath("../example/example", "github.com/avinoamr/godocdown/example/example")
 }
 
 func TestFindTemplate(t *testing.T) {
@@ -177,7 +177,7 @@ func Test(t *testing.T) {
 
 	renderHeaderTo(buffer, document)
 	if canTestImport() {
-		is("# example\n--\n    import \"github.com/robertkrimen/godocdown/example\"")
+		is("# example\n--\n    import \"github.com/avinoamr/godocdown/example\"")
 	} else {
 		is("# example\n--")
 	}
@@ -210,11 +210,11 @@ Package example is an example package with documentation
 	renderSignatureTo(buffer)
 	is(`
 --
-**godocdown** http://github.com/robertkrimen/godocdown
+**godocdown** http://github.com/avinoamr/godocdown
 	`)
 
 	renderSignatureTo(buffer)
-	Is(buffer.String(), "\n\n--\n**godocdown** http://github.com/robertkrimen/godocdown\n")
+	Is(buffer.String(), "\n\n--\n**godocdown** http://github.com/avinoamr/godocdown\n")
 }
 
 func Test_issue3(t *testing.T) {
