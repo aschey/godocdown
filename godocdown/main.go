@@ -103,6 +103,7 @@ import (
 	"fmt"
 	"go/build"
 	"go/doc"
+	"go/ast"
 	"go/parser"
 	"go/printer"
 	"go/token"
@@ -117,7 +118,7 @@ import (
 
 const (
 	punchCardWidth = 80
-	debug          = false
+	debug          = true
 )
 
 var (
@@ -204,6 +205,7 @@ type _document struct {
 	Name       string
 	pkg        *doc.Package
 	buildPkg   *build.Package
+	testFiles  map[string]*ast.File
 	IsCommand  bool
 	ImportPath string
 }
@@ -359,7 +361,7 @@ func loadDocument(target string) (*_document, error) {
 	fset = token.NewFileSet()
 	pkgSet, err := parser.ParseDir(fset, path, func(file os.FileInfo) bool {
 		name := file.Name()
-		if name[0] != '.' && strings.HasSuffix(name, ".go") && !strings.HasSuffix(name, "_test.go") {
+		if name[0] != '.' && strings.HasSuffix(name, ".go") { //} && !strings.HasSuffix(name, "_test.go") {
 			return true
 		}
 		return false
@@ -379,10 +381,21 @@ func loadDocument(target string) (*_document, error) {
 		isCommand := false
 		name := ""
 		var pkg *doc.Package
+		var testFiles map[string]*ast.File
 
 		// Choose the best package for documentation. Either
 		// documentation, main, or whatever the package is.
 		for _, parsePkg := range pkgSet {
+			// we don't want to document the test files, but we do need to keep
+			// them around to extract the examples from them.
+			astFiles := make(map[string]*ast.File)
+			for k, f := range parsePkg.Files {
+				if strings.HasSuffix(k, "_test.go") {
+					astFiles[k] = f
+					delete(parsePkg.Files, k)
+				}
+			}
+
 			tmpPkg := doc.New(parsePkg, ".", 0)
 			switch tmpPkg.Name {
 			case "main":
@@ -407,6 +420,7 @@ func loadDocument(target string) (*_document, error) {
 				// Just a regular package
 				name = tmpPkg.Name
 				pkg = tmpPkg
+				testFiles = astFiles
 			}
 		}
 
@@ -415,6 +429,7 @@ func loadDocument(target string) (*_document, error) {
 				Name:       name,
 				pkg:        pkg,
 				buildPkg:   buildPkg,
+				testFiles:	testFiles,
 				IsCommand:  isCommand,
 				ImportPath: importPath,
 			}, nil

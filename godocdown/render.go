@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go/doc"
 	"io"
+	// "strings"
 )
 
 func renderConstantSectionTo(writer io.Writer, list []*doc.Value) {
@@ -30,7 +31,12 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 		if entry.Recv != "" {
 			receiver = fmt.Sprintf("(%s) ", entry.Recv)
 		}
-		fmt.Fprintf(writer, "%s func %s%s\n\n%s\n%s\n", header, receiver, entry.Name, indentCode(sourceOfNode(entry.Decl)), formatIndent(filterText(entry.Doc)))
+		fmt.Fprintf(writer, "%s func %s%s\n\n%s\n%s\n",
+			header,
+			receiver,
+			entry.Name,
+			indentCode(sourceOfNode(entry.Decl)),
+			formatIndent(filterText(entry.Doc)))
 	}
 }
 
@@ -65,6 +71,24 @@ func renderSynopsisTo(writer io.Writer, document *_document) {
 }
 
 func renderUsageTo(writer io.Writer, document *_document) {
+
+	for k, f := range document.testFiles {
+		examples := doc.Examples(f)
+		fmt.Println("K IS", k)
+		fmt.Println("E IS", examples)
+	}
+
+	// examples := []*doc.Example{}
+	// for k, astFile := range document.astPkg.Files {
+	// 	fmt.Println("K=", k)
+	// 	if !strings.HasSuffix(k, "_test.go") {
+	// 		continue
+	// 	}
+	//
+	// 	examples := doc.Examples(astFile)
+	// 	fmt.Println("ROI", examples)
+	// }
+
 	// Usage
 	fmt.Fprintf(writer, "%s\n", RenderStyle.UsageHeader)
 
