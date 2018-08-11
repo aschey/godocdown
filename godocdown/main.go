@@ -114,6 +114,7 @@ import (
 	"strings"
 	Template "text/template"
 	Time "time"
+	"github.com/lithammer/dedent"
 )
 
 const (
@@ -233,6 +234,13 @@ func indentCode(target string) string {
 	if *flag_plain {
 		return indent(target+"\n", spacer(4))
 	}
+	if target[0] == '{' && target[len(target) - 1] == '}' {
+		// example code night be wrapped in a weird enclosing brackets. clean it
+		// up.
+		target = target[1:len(target) - 1]
+	}
+	target = dedent.Dedent(target)
+	target = strings.Trim(target, "\n")
 	return fmt.Sprintf("```go\n%s\n```", target)
 }
 
