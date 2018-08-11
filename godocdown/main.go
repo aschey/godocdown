@@ -156,7 +156,7 @@ var DefaultStyle = Style{
 	SynopsisHeader:  "###",
 	SynopsisHeading: synopsisHeadingTitleCase1Word_Regexp,
 
-	UsageHeader: "## Usage\n",
+	UsageHeader: "## Index\n",
 
 	ConstantHeader:     "##",
 	VariableHeader:     "##",

@@ -33,10 +33,10 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 		}
 		decl := indentCode(sourceOfNode(entry.Decl))
 		comment := formatIndent(filterText(entry.Doc))
-		fmt.Fprintf(writer, "%s func %s[%s]() <a name='%s'></a>\n\n%s\n%s\n",
+		fmt.Fprintf(writer, "%s <a name='%s'></a> func %s[%s]()\n\n%s\n%s\n",
 			header,
-			receiver,
 			entry.Name,
+			receiver,
 			entry.Name,
 			decl,
 			comment)
@@ -49,6 +49,8 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 	}
 }
 
+
+
 func renderExample(writer io.Writer, ex *doc.Example) {
 	code := sourceOfNode(ex.Code)
 	code = indentCode(code)
@@ -59,7 +61,12 @@ func renderTypeSectionTo(writer io.Writer, list []*doc.Type, examples map[string
 	header := RenderStyle.TypeHeader
 
 	for _, entry := range list {
-		fmt.Fprintf(writer, "%s type %s\n\n%s\n\n%s\n", header, entry.Name, indentCode(sourceOfNode(entry.Decl)), formatIndent(filterText(entry.Doc)))
+		fmt.Fprintf(writer, "%s <a name='%s'></a>type [%s]()\n\n%s\n\n%s\n",
+			header,
+			entry.Name,
+			entry.Name,
+			indentCode(sourceOfNode(entry.Decl)),
+			formatIndent(filterText(entry.Doc)))
 
 		for _, ex := range examples[entry.Name] {
 			renderExample(writer, ex)
@@ -124,14 +131,27 @@ func renderSignatureTo(writer io.Writer) {
 	}
 }
 
-
-func renderIndex(w io.Writer, d *_document) {
-	// fmt.Fprintf(w, "## Index\n\n")
-
-	for _, e := range d.pkg.Funcs {
-		decl := sourceOfNode(e.Decl)
-		fmt.Fprintf(w, " - [%s](#%s)\n", decl, e.Name)
+func renderFunctionIndexTo(w io.Writer, list []*doc.Func, inType bool) {
+	prefix := ""
+	if inType {
+		prefix = "    "
 	}
 
+	for _, e := range list {
+		decl := sourceOfNode(e.Decl)
+		fmt.Fprintf(w, "%s - [%s](#%s)\n", prefix, decl, e.Name)
+	}
+}
+
+func renderTypeIndexTo(w io.Writer, list []*doc.Type) {
+	for _, e := range list {
+		fmt.Fprintf(w, " - [type %s](#%s)\n", e.Name, e.Name)
+		renderFunctionIndexTo(w, e.Funcs, true)
+	}
+}
+
+func renderIndex(w io.Writer, d *_document) {
+	renderFunctionIndexTo(w, d.pkg.Funcs, false)
+	renderTypeIndexTo(w, d.pkg.Types)
 	fmt.Fprintf(w, "\n")
 }
