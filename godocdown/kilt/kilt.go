@@ -2,9 +2,9 @@
 
 package kilt
 
-type Kilt struct {
-}
-
-func New() *Kilt {
-	return &Kilt{}
-}
+// type Kilt struct {
+// }
+//
+// func New() *Kilt {
+// 	return &Kilt{}
+// }

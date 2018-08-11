@@ -2,8 +2,8 @@
 
 package main
 
-import (
-	Kilt "github.com/avinoamr/godocdown/godocdown/kilt"
-)
-
-var kilt = Kilt.New()
+// import (
+// 	Kilt "github.com/avinoamr/godocdown/godocdown/kilt"
+// )
+//
+// var kilt = Kilt.New()

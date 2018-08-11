@@ -171,7 +171,7 @@ var RenderStyle = DefaultStyle
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
-	kilt.PrintDefaults(flag)
+	flag.PrintDefaults()
 	executable, err := os.Stat(os.Args[0])
 	if err != nil {
 		return
