@@ -9,13 +9,13 @@ import (
 
 func renderConstantSectionTo(writer io.Writer, list []*doc.Value) {
 	for _, entry := range list {
-		fmt.Fprintf(writer, "%s\n%s\n", indentCode(sourceOfNode(entry.Decl)), formatIndent(filterText(entry.Doc)))
+		fmt.Fprintf(writer, "%s\n%s\n", indentCode(sourceOfNode(entry.Decl)), filterText(entry.Doc))
 	}
 }
 
 func renderVariableSectionTo(writer io.Writer, list []*doc.Value) {
 	for _, entry := range list {
-		fmt.Fprintf(writer, "%s\n%s\n", indentCode(sourceOfNode(entry.Decl)), formatIndent(filterText(entry.Doc)))
+		fmt.Fprintf(writer, "%s\n%s\n", indentCode(sourceOfNode(entry.Decl)), filterText(entry.Doc))
 	}
 }
 
@@ -31,15 +31,13 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 		if entry.Recv != "" {
 			receiver = fmt.Sprintf("(%s) ", entry.Recv)
 		}
-		decl := indentCode(sourceOfNode(entry.Decl))
-		comment := formatIndent(filterText(entry.Doc))
 		fmt.Fprintf(writer, "%s <a name='%s'></a> func %s[%s]()\n\n%s\n%s\n",
 			header,
 			entry.Name,
 			receiver,
 			entry.Name,
-			decl,
-			comment)
+			indentCode(sourceOfNode(entry.Decl)),
+			filterText(entry.Doc)) // use the doc as-is in markdown
 
 		if examples != nil {
 			for _, ex := range examples[entry.Name] {
@@ -49,15 +47,13 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 	}
 }
 
-
-
 func renderExample(w io.Writer, ex *doc.Example) {
 	code := sourceOfNode(ex.Code)
 	code = indentCode(code)
 
 	fmt.Fprintf(w, "<a name='Example%s'></a><details><summary>Example</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n\n",
 		ex.Name,
-		formatIndent(filterText(ex.Doc)),
+		filterText(ex.Doc),
 		code,
 		ex.Output)
 }
@@ -71,7 +67,7 @@ func renderTypeSectionTo(writer io.Writer, list []*doc.Type, examples map[string
 			entry.Name,
 			entry.Name,
 			indentCode(sourceOfNode(entry.Decl)),
-			formatIndent(filterText(entry.Doc)))
+			filterText(entry.Doc))
 
 		for _, ex := range examples[entry.Name] {
 			renderExample(writer, ex)
@@ -98,7 +94,7 @@ func renderHeaderTo(writer io.Writer, document *_document) {
 }
 
 func renderSynopsisTo(writer io.Writer, document *_document) {
-	fmt.Fprintf(writer, "%s\n", headifySynopsis(formatIndent(filterText(document.pkg.Doc))))
+	fmt.Fprintf(writer, "%s\n", headifySynopsis(filterText(document.pkg.Doc)))
 }
 
 func renderUsageTo(writer io.Writer, document *_document) {
