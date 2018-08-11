@@ -2,8 +2,8 @@
 
 package main
 
-import (
-	Dbg "github.com/avinoamr/godocdown/godocdown/dbg"
-)
+// import (
+// 	Dbg "github.com/avinoamr/godocdown/godocdown/dbg"
+// )
 
-var dbg, dbgf = Dbg.New()
+// var dbg, dbgf = Dbg.New()
