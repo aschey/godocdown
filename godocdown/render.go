@@ -31,7 +31,15 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 		if entry.Recv != "" {
 			receiver = fmt.Sprintf("(%s) ", entry.Recv)
 		}
-		fmt.Fprintf(writer, "%s func %s%s\n\n%s\n%s\n", header, receiver, entry.Name, indentCode(sourceOfNode(entry.Decl)), formatIndent(filterText(entry.Doc)))
+		decl := indentCode(sourceOfNode(entry.Decl))
+		comment := formatIndent(filterText(entry.Doc))
+		fmt.Fprintf(writer, "%s func %s[%s]() <a name='%s'></a>\n\n%s\n%s\n",
+			header,
+			receiver,
+			entry.Name,
+			entry.Name,
+			decl,
+			comment)
 
 		if examples != nil {
 			for _, ex := range examples[entry.Name] {
@@ -94,6 +102,9 @@ func renderUsageTo(writer io.Writer, document *_document) {
 	// Usage
 	fmt.Fprintf(writer, "%s\n", RenderStyle.UsageHeader)
 
+	// render index
+	renderIndex(writer, document)
+
 	// Constant Section
 	renderConstantSectionTo(writer, document.pkg.Consts)
 
@@ -111,4 +122,16 @@ func renderSignatureTo(writer io.Writer) {
 	if RenderStyle.IncludeSignature {
 		fmt.Fprintf(writer, "\n\n--\n**godocdown** http://github.com/avinoamr/godocdown\n")
 	}
+}
+
+
+func renderIndex(w io.Writer, d *_document) {
+	// fmt.Fprintf(w, "## Index\n\n")
+
+	for _, e := range d.pkg.Funcs {
+		decl := sourceOfNode(e.Decl)
+		fmt.Fprintf(w, " - [%s](#%s)\n", decl, e.Name)
+	}
+
+	fmt.Fprintf(w, "\n")
 }

@@ -158,11 +158,11 @@ var DefaultStyle = Style{
 
 	UsageHeader: "## Usage\n",
 
-	ConstantHeader:     "####",
-	VariableHeader:     "####",
-	FunctionHeader:     "####",
-	TypeHeader:         "####",
-	TypeFunctionHeader: "####",
+	ConstantHeader:     "##",
+	VariableHeader:     "##",
+	FunctionHeader:     "##",
+	TypeHeader:         "##",
+	TypeFunctionHeader: "##",
 
 	IncludeSignature: false,
 }
