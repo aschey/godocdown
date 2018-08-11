@@ -217,7 +217,8 @@ func takeOut7f(input string) string {
 func _formatIndent(target, indent, preIndent string) string {
 	var buffer bytes.Buffer
 	toText(&buffer, target, indent, preIndent, punchCardWidth-2*len(indent))
-	return buffer.String()
+	s := buffer.String()
+	return s
 }
 
 func spacer(width int) string {

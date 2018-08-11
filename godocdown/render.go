@@ -5,6 +5,7 @@ import (
 	"go/doc"
 	"io"
 	"strings"
+	"github.com/lithammer/dedent"
 )
 
 func renderConstantSectionTo(writer io.Writer, list []*doc.Value) {
@@ -51,10 +52,22 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 
 
 
-func renderExample(writer io.Writer, ex *doc.Example) {
+func renderExample(w io.Writer, ex *doc.Example) {
 	code := sourceOfNode(ex.Code)
+	if code[0] == '{' {
+		// example code night be wrapped in a weird enclosing brackets. clean it
+		// up.
+		code = code[3:len(code) - 3]
+	}
+	code = dedent.Dedent(code)
 	code = indentCode(code)
-	fmt.Fprintf(writer, "<details><summary>Example</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n\n", formatIndent(filterText(ex.Doc)), code, ex.Output)
+
+
+	fmt.Fprintf(w, "<a name='Example%s'></a><details><summary>Example</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n\n",
+		ex.Name,
+		formatIndent(filterText(ex.Doc)),
+		code,
+		ex.Output)
 }
 
 func renderTypeSectionTo(writer io.Writer, list []*doc.Type, examples map[string][]*doc.Example) {
