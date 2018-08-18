@@ -215,19 +215,20 @@ func takeOut7f(input string) string {
 	return match_7f.ReplaceAllString(input, "")
 }
 
-func _formatIndent(target, indent, preIndent string) string {
-	var buffer bytes.Buffer
-	toText(&buffer, target, indent, preIndent, punchCardWidth-2*len(indent))
-	s := buffer.String()
-	return dedent.Dedent(s)
-}
+// func _formatIndent(target, indent, preIndent string) string {
+// 	var buffer bytes.Buffer
+// 	toText(&buffer, target, indent, preIndent, punchCardWidth-2*len(indent))
+// 	s := buffer.String()
+// 	return dedent.Dedent(s)
+// }
+//
+//
+// func formatIndent(target string) string {
+// 	return _formatIndent(target, spacer(0), spacer(0))
+// }
 
 func spacer(width int) string {
 	return strings.Repeat(" ", width)
-}
-
-func formatIndent(target string) string {
-	return _formatIndent(target, spacer(0), spacer(0))
 }
 
 func indentCode(target string) string {
