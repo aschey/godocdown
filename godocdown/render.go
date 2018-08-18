@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"go/doc"
 	"io"
-	"strings"
 )
 
 func renderConstantSectionTo(writer io.Writer, list []*doc.Value) {
@@ -19,7 +18,7 @@ func renderVariableSectionTo(writer io.Writer, list []*doc.Value) {
 	}
 }
 
-func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection bool, examples map[string][]*doc.Example) {
+func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection bool, exs []*doc.Example) {
 
 	header := RenderStyle.FunctionHeader
 	if inTypeSection {
@@ -39,10 +38,8 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 			indentCode(sourceOfNode(entry.Decl)),
 			filterText(entry.Doc)) // use the doc as-is in markdown
 
-		if examples != nil {
-			for _, ex := range examples[entry.Name] {
-				renderExample(writer, ex)
-			}
+		for _, ex := range filterExamples(exs, entry.Name) {
+			renderExample(writer, ex)
 		}
 	}
 }
@@ -51,21 +48,15 @@ func renderExample(w io.Writer, ex *doc.Example) {
 	code := sourceOfNode(ex.Code)
 	code = indentCode(code)
 
-	var subName string
-	comps := strings.SplitN(ex.Name, "_", 2)
-	if len(comps) > 1 {
-		subName = "(" + strings.Replace(comps[1], "_", " ", -1) + ")"
-	}
-
 	fmt.Fprintf(w, "<a name='Example%s'></a><details><summary>Example %s</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n\n",
 		ex.Name,
-		subName,
+		subName(ex.Name),
 		filterText(ex.Doc),
 		code,
 		ex.Output)
 }
 
-func renderTypeSectionTo(writer io.Writer, list []*doc.Type, examples map[string][]*doc.Example) {
+func renderTypeSectionTo(writer io.Writer, list []*doc.Type, exs []*doc.Example) {
 	header := RenderStyle.TypeHeader
 
 	for _, entry := range list {
@@ -76,13 +67,13 @@ func renderTypeSectionTo(writer io.Writer, list []*doc.Type, examples map[string
 			indentCode(sourceOfNode(entry.Decl)),
 			filterText(entry.Doc))
 
-		for _, ex := range examples[entry.Name] {
+		for _, ex := range filterExamples(exs, entry.Name) {
 			renderExample(writer, ex)
 		}
 
 		renderConstantSectionTo(writer, entry.Consts)
 		renderVariableSectionTo(writer, entry.Vars)
-		renderFunctionSectionTo(writer, entry.Funcs, true, examples)
+		renderFunctionSectionTo(writer, entry.Funcs, true, exs)
 		renderFunctionSectionTo(writer, entry.Methods, true, nil)
 	}
 }
@@ -106,11 +97,10 @@ func renderSynopsisTo(writer io.Writer, document *_document) {
 
 func renderUsageTo(writer io.Writer, document *_document) {
 
-	examples := map[string][]*doc.Example{}
+	exs := []*doc.Example{}
 	for _, f := range document.testFiles {
 		for _, e := range doc.Examples(f) {
-			root := strings.SplitN(e.Name, "_", 2)[0]
-			examples[root] = append(examples[root], e)
+			exs = append(exs, e)
 		}
 	}
 
@@ -118,7 +108,7 @@ func renderUsageTo(writer io.Writer, document *_document) {
 	fmt.Fprintf(writer, "%s\n", RenderStyle.UsageHeader)
 
 	// render index
-	renderIndex(writer, document)
+	renderIndex(writer, document, exs)
 
 	// Constant Section
 	renderConstantSectionTo(writer, document.pkg.Consts)
@@ -127,10 +117,10 @@ func renderUsageTo(writer io.Writer, document *_document) {
 	renderVariableSectionTo(writer, document.pkg.Vars)
 
 	// Function Section
-	renderFunctionSectionTo(writer, document.pkg.Funcs, false, examples)
+	renderFunctionSectionTo(writer, document.pkg.Funcs, false, exs)
 
 	// Type Section
-	renderTypeSectionTo(writer, document.pkg.Types, examples)
+	renderTypeSectionTo(writer, document.pkg.Types, exs)
 }
 
 func renderSignatureTo(writer io.Writer) {
@@ -158,8 +148,20 @@ func renderTypeIndexTo(w io.Writer, list []*doc.Type) {
 	}
 }
 
-func renderIndex(w io.Writer, d *_document) {
+func renderExampleIndexTo(w io.Writer, list []*doc.Example) {
+	if len(list) == 0 {
+		return
+	}
+
+	fmt.Fprintf(w, "\n#### Examples\n\n")
+	for _, e := range list {
+		fmt.Fprintf(w, " - [type %s %s](#%s)\n", e.Name, subName(e.Name), e.Name)
+	}
+}
+
+func renderIndex(w io.Writer, d *_document, exs []*doc.Example) {
 	renderFunctionIndexTo(w, d.pkg.Funcs, false)
 	renderTypeIndexTo(w, d.pkg.Types)
+	renderExampleIndexTo(w, exs)
 	fmt.Fprintf(w, "\n")
 }

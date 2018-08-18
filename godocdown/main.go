@@ -227,6 +227,18 @@ func takeOut7f(input string) string {
 // 	return _formatIndent(target, spacer(0), spacer(0))
 // }
 
+// filterExamples filters the list of examples to only includes the ones that
+// are associated with the provided type/func name
+func filterExamples(exs []*doc.Example, name string) (res []*doc.Example) {
+	for _, e := range exs {
+		root := strings.SplitN(e.Name, "_", 2)[0]
+		if root == name {
+			res = append(res, e)
+		}
+	}
+	return
+}
+
 func spacer(width int) string {
 	return strings.Repeat(" ", width)
 }
@@ -253,6 +265,16 @@ func headifySynopsis(target string) string {
 	return detect.ReplaceAllStringFunc(target, func(heading string) string {
 		return fmt.Sprintf("%s %s", RenderStyle.SynopsisHeader, heading)
 	})
+}
+
+// subName is a more-specific version of an example name, allowing for multiple
+// examples of the same structures
+func subName(name string) (subName string) {
+	comps := strings.SplitN(name, "_", 2)
+	if len(comps) > 1 {
+		subName = "(" + strings.Replace(comps[1], "_", " ", -1) + ")"
+	}
+	return
 }
 
 func headlineSynopsis(synopsis, header string, scanner *regexp.Regexp) string {
