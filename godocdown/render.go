@@ -51,8 +51,15 @@ func renderExample(w io.Writer, ex *doc.Example) {
 	code := sourceOfNode(ex.Code)
 	code = indentCode(code)
 
-	fmt.Fprintf(w, "<a name='Example%s'></a><details><summary>Example</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n\n",
+	var subName string
+	comps := strings.SplitN(ex.Name, "_", 2)
+	if len(comps) > 1 {
+		subName = "(" + strings.Replace(comps[1], "_", " ", -1) + ")"
+	}
+
+	fmt.Fprintf(w, "<a name='Example%s'></a><details><summary>Example %s</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n\n",
 		ex.Name,
+		subName,
 		filterText(ex.Doc),
 		code,
 		ex.Output)
