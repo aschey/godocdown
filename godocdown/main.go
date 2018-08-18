@@ -267,12 +267,11 @@ func headifySynopsis(target string) string {
 	})
 }
 
-// subName is a more-specific version of an example name, allowing for multiple
-// examples of the same structures
-func subName(name string) (subName string) {
+func exampleNames(name string) (base, sub string) {
 	comps := strings.SplitN(name, "_", 2)
+	base = comps[0]
 	if len(comps) > 1 {
-		subName = "(" + strings.Replace(comps[1], "_", " ", -1) + ")"
+		sub = " (" + strings.Replace(comps[1], "_", " ", -1) + ")"
 	}
 	return
 }

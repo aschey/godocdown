@@ -48,9 +48,10 @@ func renderExample(w io.Writer, ex *doc.Example) {
 	code := sourceOfNode(ex.Code)
 	code = indentCode(code)
 
-	fmt.Fprintf(w, "<a name='Example%s'></a><details><summary>Example %s</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n\n",
-		ex.Name,
-		subName(ex.Name),
+	name, sub := exampleNames(ex.Name)
+	fmt.Fprintf(w, "<a name='Example%s'></a><details><summary>Example%s</summary><p>\n\n%s\n%s\n\nOutput:\n```\n%s```\n</p></details>\n\n",
+		name,
+		sub,
 		filterText(ex.Doc),
 		code,
 		ex.Output)
@@ -155,7 +156,8 @@ func renderExampleIndexTo(w io.Writer, list []*doc.Example) {
 
 	fmt.Fprintf(w, "\n#### Examples\n\n")
 	for _, e := range list {
-		fmt.Fprintf(w, " - [type %s %s](#%s)\n", e.Name, subName(e.Name), e.Name)
+		name, sub := exampleNames(e.Name)
+		fmt.Fprintf(w, " - [type %s%s](#%s)\n", name, sub, e.Name)
 	}
 }
 
