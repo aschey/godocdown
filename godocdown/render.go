@@ -81,13 +81,15 @@ func renderTypeSectionTo(writer io.Writer, list []*doc.Type, exs []*doc.Example)
 }
 
 func renderHeaderTo(writer io.Writer, document *_document) {
-	fmt.Fprintf(writer, "# %s\n--\n", document.Name)
+	fmt.Fprintf(writer, "# %s\n\n", document.Name)
 
 	if !document.IsCommand {
 		// Import
 		if RenderStyle.IncludeImport {
 			if document.ImportPath != "" {
-				fmt.Fprintf(writer, spacer(4)+"import \"%s\"\n\n", document.ImportPath)
+				code := fmt.Sprintf(`import "%s"`, document.ImportPath)
+				code = indentCode(code)
+				fmt.Fprintf(writer, "%s\n\n", code)
 			}
 		}
 	}
