@@ -109,6 +109,7 @@ import (
 	"go/token"
 	"io/ioutil"
 	"os"
+	"sort"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -209,6 +210,7 @@ type _document struct {
 	testFiles  map[string]*ast.File
 	IsCommand  bool
 	ImportPath string
+	Examples   examples
 }
 
 func takeOut7f(input string) string {
@@ -292,6 +294,10 @@ func sourceOfNode(target interface{}) string {
 	return strip_Regexp.ReplaceAllString(buffer.String(), "")
 }
 
+func indentNode(target interface{}) string {
+	return indentCode(sourceOfNode(target))
+}
+
 func indent(target string, indent string) string {
 	return indent_Regexp.ReplaceAllString(target, indent+"$1")
 }
@@ -314,6 +320,12 @@ func trimSpace(buffer *bytes.Buffer) {
 func fromSlash(path string) string {
 	return filepath.FromSlash(path)
 }
+
+func exampleSubName(name string) string {
+	_, sub := exampleNames(name)
+	return sub
+}
+
 
 /*
     This is how godoc does it:
@@ -456,6 +468,14 @@ func loadDocument(target string) (*_document, error) {
 		}
 
 		if pkg != nil {
+			var exs examples
+			for _, f := range testFiles {
+				for _, e := range doc.Examples(f) {
+					exs = append(exs, e)
+				}
+			}
+
+			sort.Sort(exs)
 			return &_document{
 				Name:       name,
 				pkg:        pkg,
@@ -463,6 +483,7 @@ func loadDocument(target string) (*_document, error) {
 				testFiles:	testFiles,
 				IsCommand:  isCommand,
 				ImportPath: importPath,
+				Examples: exs,
 			}, nil
 		}
 	}
@@ -593,6 +614,43 @@ func loadTemplate(document *_document) *Template.Template {
 	return template
 }
 
+func (self *_document) Badge() string {
+	return "[![GoDocDown](https://img.shields.io/badge/docs-generated-blue.svg?longCache=true)](https://github.com/avinoamr/godocdown)"
+}
+
+func (*_document) ToCode(code string) string {
+	return indentCode(code)
+}
+
+func (self *_document) Synopsis() string {
+	return headifySynopsis(filterText(self.pkg.Doc))
+}
+
+func (self *_document) Import() string {
+	return fmt.Sprintf(`import "%s"`, self.ImportPath)
+}
+
+func (self *_document) Funcs() []*doc.Func {
+	return self.pkg.Funcs
+}
+
+func (self *_document) Types() []*doc.Type {
+	return self.pkg.Types
+}
+
+func (self *_document) Consts() []*doc.Value {
+	return self.pkg.Consts
+}
+
+func (self *_document) Vars() []*doc.Value {
+	return self.pkg.Vars
+}
+
+type examples []*doc.Example
+func (exs examples) Len() int { return len(exs) }
+func (exs examples) Less(i, j int) bool { return exs[i].Name < exs[j].Name}
+func (exs examples) Swap(i, j int) { exs[i], exs[j] = exs[j], exs[i] }
+
 func main() {
 	flag.Parse(os.Args[1:])
 	target := flag.Arg(0)
@@ -632,14 +690,31 @@ func main() {
 		}
 	}
 
-	template := loadTemplate(document)
-
+	tpl := loadTemplate(document)
 	var buffer bytes.Buffer
-	if template == nil {
+	if tpl == nil {
 		document.EmitTo(&buffer)
 		document.EmitSignatureTo(&buffer)
+
+		// tpl, err = Template.New("").Funcs(Template.FuncMap{
+		// 	"indentCode": indentCode,
+		// 	"sourceOfNode": sourceOfNode,
+		// 	"indentNode": indentNode,
+		// 	"filterText": filterText,
+		// 	"exampleSubName": exampleSubName,
+		// 	"filterExamples": filterExamples,
+		// }).Parse(tplTxt)
+		//
+		// if err != nil {
+		// 	panic(err)
+		// }
+		//
+		// err = tpl.Execute(&buffer, document)
+		// if err != nil {
+		// 	panic(err)
+		// }
 	} else {
-		err := template.Templates()[0].Execute(&buffer, document)
+		err := tpl.Templates()[0].Execute(&buffer, document)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "Error running template: %v", err)
 			os.Exit(1)

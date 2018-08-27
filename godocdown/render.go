@@ -1,7 +1,6 @@
 package main
 
 import (
-	"sort"
 	"fmt"
 	"go/doc"
 	"io"
@@ -101,14 +100,7 @@ func renderSynopsisTo(writer io.Writer, document *_document) {
 
 func renderUsageTo(writer io.Writer, document *_document) {
 
-	var exs examples
-	for _, f := range document.testFiles {
-		for _, e := range doc.Examples(f) {
-			exs = append(exs, e)
-		}
-	}
-
-	sort.Sort(exs)
+	exs := document.Examples
 
 	// Usage
 	fmt.Fprintf(writer, "%s\n", RenderStyle.UsageHeader)
@@ -172,9 +164,3 @@ func renderIndex(w io.Writer, d *_document, exs []*doc.Example) {
 	renderExampleIndexTo(w, exs)
 	fmt.Fprintf(w, "\n")
 }
-
-
-type examples []*doc.Example
-func (exs examples) Len() int { return len(exs) }
-func (exs examples) Less(i, j int) bool { return exs[i].Name < exs[j].Name}
-func (exs examples) Swap(i, j int) { exs[i], exs[j] = exs[j], exs[i] }
