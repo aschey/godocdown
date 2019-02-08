@@ -101,20 +101,21 @@ import (
 	"bytes"
 	Flag "flag"
 	"fmt"
+	"go/ast"
 	"go/build"
 	"go/doc"
-	"go/ast"
 	"go/parser"
 	"go/printer"
 	"go/token"
 	"io/ioutil"
 	"os"
-	"sort"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 	Template "text/template"
 	Time "time"
+
 	"github.com/lithammer/dedent"
 )
 
@@ -130,6 +131,7 @@ var (
 	flag_heading    = flag.String("heading", "TitleCase1Word", "Heading detection method: 1Word, TitleCase, Title, TitleCase1Word, \"\"")
 	flag_template   = flag.String("template", "", "The template file to use")
 	flag_noTemplate = flag.Bool("no-template", false, "Disable template processing")
+	flag_noFuncs    = flag.Bool("no-funcs", false, "Ignore Funcs")
 	flag_output     = ""
 	_               = func() byte {
 		flag.StringVar(&flag_output, "output", flag_output, "Write output to a file instead of stdout. Write to stdout with -")
@@ -249,10 +251,10 @@ func indentCode(target string) string {
 	if *flag_plain {
 		return indent(target+"\n", spacer(4))
 	}
-	if target[0] == '{' && target[len(target) - 1] == '}' {
+	if target[0] == '{' && target[len(target)-1] == '}' {
 		// example code night be wrapped in a weird enclosing brackets. clean it
 		// up.
-		target = target[1:len(target) - 1]
+		target = target[1 : len(target)-1]
 	}
 	target = dedent.Dedent(target)
 	target = strings.Trim(target, "\n")
@@ -325,7 +327,6 @@ func exampleSubName(name string) string {
 	_, sub := exampleNames(name)
 	return sub
 }
-
 
 /*
     This is how godoc does it:
@@ -480,10 +481,10 @@ func loadDocument(target string) (*_document, error) {
 				Name:       name,
 				pkg:        pkg,
 				buildPkg:   buildPkg,
-				testFiles:	testFiles,
+				testFiles:  testFiles,
 				IsCommand:  isCommand,
 				ImportPath: importPath,
-				Examples: exs,
+				Examples:   exs,
 			}, nil
 		}
 	}
@@ -647,9 +648,10 @@ func (self *_document) Vars() []*doc.Value {
 }
 
 type examples []*doc.Example
-func (exs examples) Len() int { return len(exs) }
-func (exs examples) Less(i, j int) bool { return exs[i].Name < exs[j].Name}
-func (exs examples) Swap(i, j int) { exs[i], exs[j] = exs[j], exs[i] }
+
+func (exs examples) Len() int           { return len(exs) }
+func (exs examples) Less(i, j int) bool { return exs[i].Name < exs[j].Name }
+func (exs examples) Swap(i, j int)      { exs[i], exs[j] = exs[j], exs[i] }
 
 func main() {
 	flag.Parse(os.Args[1:])
@@ -687,6 +689,14 @@ func main() {
 		} else {
 			fmt.Fprintf(os.Stderr, "Could not find package: %s\n", target)
 			os.Exit(1)
+		}
+	}
+
+	if *flag_noFuncs {
+		document.pkg.Funcs = nil
+		for i := range document.pkg.Types {
+			document.pkg.Types[i].Funcs = nil
+			document.pkg.Types[i].Methods = nil
 		}
 	}
 
