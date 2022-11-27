@@ -1,15 +1,14 @@
 // Package godocdown is placeholder for the godocdown command
 //
 // This is a placeholder package, the actual command is:
-// http://github.com/avinoamr/godocdown/godocdown
+// http://github.com/aschey/godocdown/godocdown
 //
-//      $ go get http://github.com/avinoamr/godocdown/godocdown
+//	$ go get http://github.com/aschey/godocdown/godocdown
 //
-//      # Generate documentation, like godoc
-//      $ godocdown .
-//
+//	# Generate documentation, like godoc
+//	$ godocdown .
 package godocdown
 
 import (
-	_ "github.com/avinoamr/godocdown/godocdown"
+	_ "github.com/aschey/godocdown/godocdown"
 )

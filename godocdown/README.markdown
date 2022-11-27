@@ -1,9 +1,10 @@
 # godocdown
+
 --
 Command godocdown generates Go documentation in a GitHub-friendly Markdown
 format.
 
-    $ go get github.com/avinoamr/godocdown/godocdown
+    $ go get github.com/aschey/godocdown/godocdown
 
     $ godocdown /path/to/package > README.markdown
 
@@ -20,12 +21,11 @@ changed with the use of the "plain" flag to generate standard Markdown.
 
 ### Install
 
-    go get github.com/avinoamr/godocdown/godocdown
-
+    go get github.com/aschey/godocdown/godocdown
 
 ### Example
 
-http://github.com/avinoamr/godocdown/blob/master/example.markdown
+http://github.com/aschey/godocdown/blob/master/example.markdown
 
 ### Usage
 
@@ -58,7 +58,6 @@ http://github.com/avinoamr/godocdown/blob/master/example.markdown
             ([A-Za-z0-9_-]\s*)+
 
         TitleCase1Word: The line matches either the TitleCase or 1Word pattern
-
 
 ### Templating
 
@@ -104,4 +103,4 @@ the following interface:
     // (This field will be the empty string if godocdown is unable to guess it)
 
 --
-**godocdown** http://github.com/avinoamr/godocdown
+**godocdown** http://github.com/aschey/godocdown

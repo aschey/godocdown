@@ -1,6 +1,6 @@
 # Example godocdown (strings)
 
-This markdown was generated with the help of custom template file ([example.template](http://github.com/avinoamr/godocdown/blob/master/example.template)). To add custom
+This markdown was generated with the help of custom template file ([example.template](http://github.com/aschey/godocdown/blob/master/example.template)). To add custom
 markdown to your documentation, you can do something like:
 
     godocdown -template=godocdown.tmpl ...

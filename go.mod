@@ -1,6 +1,5 @@
-module github.com/dionysius/godocdown
+module github.com/aschey/godocdown
 
-require (
-	github.com/avinoamr/godocdown v0.0.0-20180827184835-3883e8fb3eca
-	github.com/lithammer/dedent v1.1.0
-)
+go 1.19
+
+require github.com/lithammer/dedent v1.1.0

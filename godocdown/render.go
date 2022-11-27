@@ -26,14 +26,14 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 	}
 
 	for _, entry := range list {
-		receiver := " "
+		receiver := ""
 		if entry.Recv != "" {
-			receiver = fmt.Sprintf("(%s) ", entry.Recv)
+			receiver = fmt.Sprintf("\\(%s\\) ", entry.Recv)
 		}
-		fmt.Fprintf(writer, "%s <a name='%s'></a> func %s[%s]()\n\n%s\n%s\n",
+		fmt.Fprintf(writer, "%s func %s%s\\(\\) {#%s}\n\n%s\n%s\n",
 			header,
-			entry.Name,
 			receiver,
+			entry.Name,
 			entry.Name,
 			indentCode(sourceOfNode(entry.Decl)),
 			filterText(entry.Doc)) // use the doc as-is in markdown
@@ -61,7 +61,7 @@ func renderTypeSectionTo(writer io.Writer, list []*doc.Type, exs []*doc.Example)
 	header := RenderStyle.TypeHeader
 
 	for _, entry := range list {
-		fmt.Fprintf(writer, "%s <a name='%s'></a>type [%s]()\n\n%s\n\n%s\n",
+		fmt.Fprintf(writer, "%s type %s\\(\\) {#%s}\n\n%s\n\n%s\n",
 			header,
 			entry.Name,
 			entry.Name,
@@ -123,7 +123,7 @@ func renderUsageTo(writer io.Writer, document *_document) {
 
 func renderSignatureTo(writer io.Writer) {
 	if RenderStyle.IncludeSignature {
-		fmt.Fprintf(writer, "\n\n--\n**godocdown** http://github.com/avinoamr/godocdown\n")
+		fmt.Fprintf(writer, "\n\n--\n**godocdown** http://github.com/aschey/godocdown\n")
 	}
 }
 

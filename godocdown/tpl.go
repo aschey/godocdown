@@ -8,7 +8,7 @@ const tplTxt = `
 {{end}}
 
 {{define "Func"}}
-## <a name="{{.Name}}"></a> func {{if .Recv}}({{.Recv}}){{end}}[{{.Name}}](#{{.Name}})
+## func {{if .Recv}}({{.Recv}}){{end}}[{{.Name}}](#{{.Name}}) {{#{{.Name}}}}
 {{template "Code" .}}
 
 {{range $examples}}{{template "Example" .}}{{end}}
@@ -24,7 +24,7 @@ Output:
 {{end}}
 
 {{define "Type"}}
-## <a name="{{.Name}}"></a> type [{{.Name}}](#{{.Name}})
+## type [{{.Name}}](#{{.Name}})  {{#{{.Name}}}}
 {{template "Code" .}}
 {{range .Consts}}{{template "Code" .}}{{end}}
 {{range .Vars}}{{template "Code" .}}{{end}}

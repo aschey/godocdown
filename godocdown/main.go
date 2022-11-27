@@ -1,15 +1,15 @@
 /*
 Command godocdown generates Go documentation in a GitHub-friendly Markdown format.
 
-    $ go get github.com/avinoamr/godocdown/godocdown                         
-                                                                                 
-    $ godocdown /path/to/package > README.markdown                               
-                                                                                 
-    # Generate documentation for the package/command in the current directory    
-    $ godocdown > README.markdown                                                
-                                                                                 
-    # Generate standard Markdown                                                 
-    $ godocdown -plain .                                                         
+	$ go get github.com/aschey/godocdown/godocdown                         
+	                                                                             
+	$ godocdown /path/to/package > README.markdown                               
+	                                                                             
+	# Generate documentation for the package/command in the current directory    
+	$ godocdown > README.markdown                                                
+	                                                                             
+	# Generate standard Markdown                                                 
+	$ godocdown -plain .                                                         
 
 This program is targeted at providing nice-looking documentation for GitHub. With this in
 mind, it generates GitHub Flavored Markdown (http://github.github.com/github-flavored-markdown/) by
@@ -17,83 +17,83 @@ default. This can be changed with the use of the "plain" flag to generate standa
 
 Install
 
-    go get github.com/avinoamr/godocdown/godocdown
+	go get github.com/aschey/godocdown/godocdown
 
-Example
+# Example
 
-http://github.com/avinoamr/godocdown/blob/master/example.markdown
+http://github.com/aschey/godocdown/blob/master/example.markdown
 
 Usage
 
-    -output=""                                                                       
-        Write output to a file instead of stdout                                     
-        Write to stdout with -                                                       
-                                                                                     
-    -template=""                                                                     
-        The template file to use                                                     
-                                                                                     
-    -no-template=false                                                               
-        Disable template processing                                                  
-                                                                                     
-    -plain=false                                                                     
-        Emit standard Markdown, rather than Github Flavored Markdown                 
-                                                                                     
-    -heading="TitleCase1Word"                                                        
-        Heading detection method: 1Word, TitleCase, Title, TitleCase1Word, ""        
-        For each line of the package declaration, godocdown attempts to detect if    
-        a heading is present via a pattern match. If a heading is detected,          
-        it prefixes the line with a Markdown heading indicator (typically "###").    
-                                                                                     
-        1Word: Only a single word on the entire line                                 
-            [A-Za-z0-9_-]+                                                           
-                                                                                     
-        TitleCase: A line where each word has the first letter capitalized           
-            ([A-Z][A-Za-z0-9_-]\s*)+                                                 
-                                                                                     
-        Title: A line without punctuation (e.g. a period at the end)                 
-            ([A-Za-z0-9_-]\s*)+                                                      
-                                                                                     
-        TitleCase1Word: The line matches either the TitleCase or 1Word pattern       
+	-output=""                                                                       
+	    Write output to a file instead of stdout                                     
+	    Write to stdout with -                                                       
+	                                                                                 
+	-template=""                                                                     
+	    The template file to use                                                     
+	                                                                                 
+	-no-template=false                                                               
+	    Disable template processing                                                  
+	                                                                                 
+	-plain=false                                                                     
+	    Emit standard Markdown, rather than Github Flavored Markdown                 
+	                                                                                 
+	-heading="TitleCase1Word"                                                        
+	    Heading detection method: 1Word, TitleCase, Title, TitleCase1Word, ""        
+	    For each line of the package declaration, godocdown attempts to detect if    
+	    a heading is present via a pattern match. If a heading is detected,          
+	    it prefixes the line with a Markdown heading indicator (typically "###").    
+	                                                                                 
+	    1Word: Only a single word on the entire line                                 
+	        [A-Za-z0-9_-]+                                                           
+	                                                                                 
+	    TitleCase: A line where each word has the first letter capitalized           
+	        ([A-Z][A-Za-z0-9_-]\s*)+                                                 
+	                                                                                 
+	    Title: A line without punctuation (e.g. a period at the end)                 
+	        ([A-Za-z0-9_-]\s*)+                                                      
+	                                                                                 
+	    TitleCase1Word: The line matches either the TitleCase or 1Word pattern       
 
-Templating
+# Templating
 
 In addition to Markdown rendering, godocdown provides templating via text/template (http://golang.org/pkg/text/template/)
 for further customization. By putting a file named ".godocdown.template" (or one from the list below) in the same directory as your
 package/command, godocdown will know to use the file as a template.
 
-    # text/template
-    .godocdown.markdown
-    .godocdown.md
-    .godocdown.template
-    .godocdown.tmpl
+	# text/template
+	.godocdown.markdown
+	.godocdown.md
+	.godocdown.template
+	.godocdown.tmpl
 
 A template file can also be specified with the "-template" parameter
 
 Along with the standard template functionality, the starting data argument has the following interface:
 
-    {{ .Emit }}                                                                                       
-    // Emit the standard documentation (what godocdown would emit without a template)                 
-                                                                                                      
-    {{ .EmitHeader }}                                                                                 
-    // Emit the package name and an import line (if one is present/needed)                            
-                                                                                                      
-    {{ .EmitSynopsis }}                                                                               
-    // Emit the package declaration                                                                   
-                                                                                                      
-    {{ .EmitUsage }}                                                                                  
-    // Emit package usage, which includes a constants section, a variables section,                   
-    // a functions section, and a types section. In addition, each type may have its own constant,    
-    // variable, and/or function/method listing.                                                      
-                                                                                                      
-    {{ if .IsCommand  }} ... {{ end }}                                                                
-    // A boolean indicating whether the given package is a command or a plain package                 
-                                                                                                      
-    {{ .Name }}                                                                                       
-    // The name of the package/command (string)                                                       
-                                                                                                      
-    {{ .ImportPath }}                                                                                 
-    // The import path for the package (string)                                                       
-    // (This field will be the empty string if godocdown is unable to guess it)                       
+	{{ .Emit }}                                                                                       
+	// Emit the standard documentation (what godocdown would emit without a template)                 
+	                                                                                                  
+	{{ .EmitHeader }}                                                                                 
+	// Emit the package name and an import line (if one is present/needed)                            
+	                                                                                                  
+	{{ .EmitSynopsis }}                                                                               
+	// Emit the package declaration                                                                   
+	                                                                                                  
+	{{ .EmitUsage }}                                                                                  
+	// Emit package usage, which includes a constants section, a variables section,                   
+	// a functions section, and a types section. In addition, each type may have its own constant,    
+	// variable, and/or function/method listing.                                                      
+	                                                                                                  
+	{{ if .IsCommand  }} ... {{ end }}                                                                
+	// A boolean indicating whether the given package is a command or a plain package                 
+	                                                                                                  
+	{{ .Name }}                                                                                       
+	// The name of the package/command (string)                                                       
+	                                                                                                  
+	{{ .ImportPath }}                                                                                 
+	// The import path for the package (string)                                                       
+	// (This field will be the empty string if godocdown is unable to guess it)                       
 */
 package main
 
@@ -329,41 +329,41 @@ func exampleSubName(name string) string {
 }
 
 /*
-    This is how godoc does it:
+	    This is how godoc does it:
 
-	// Determine paths.
-	//
-	// If we are passed an operating system path like . or ./foo or /foo/bar or c:\mysrc,
-	// we need to map that path somewhere in the fs name space so that routines
-	// like getPageInfo will see it.  We use the arbitrarily-chosen virtual path "/target"
-	// for this.  That is, if we get passed a directory like the above, we map that
-	// directory so that getPageInfo sees it as /target.
-	const target = "/target"
-	const cmdPrefix = "cmd/"
-	path := flag.Arg(0)
-	var forceCmd bool
-	var abspath, relpath string
-	if filepath.IsAbs(path) {
-		fs.Bind(target, OS(path), "/", bindReplace)
-		abspath = target
-	} else if build.IsLocalImport(path) {
-		cwd, _ := os.Getwd() // ignore errors
-		path = filepath.Join(cwd, path)
-		fs.Bind(target, OS(path), "/", bindReplace)
-		abspath = target
-	} else if strings.HasPrefix(path, cmdPrefix) {
-		path = path[len(cmdPrefix):]
-		forceCmd = true
-	} else if bp, _ := build.Import(path, "", build.FindOnly); bp.Dir != "" && bp.ImportPath != "" {
-		fs.Bind(target, OS(bp.Dir), "/", bindReplace)
-		abspath = target
-		relpath = bp.ImportPath
-	} else {
-		abspath = pathpkg.Join(pkgHandler.fsRoot, path)
-	}
-	if relpath == "" {
-		relpath = abspath
-	}
+		// Determine paths.
+		//
+		// If we are passed an operating system path like . or ./foo or /foo/bar or c:\mysrc,
+		// we need to map that path somewhere in the fs name space so that routines
+		// like getPageInfo will see it.  We use the arbitrarily-chosen virtual path "/target"
+		// for this.  That is, if we get passed a directory like the above, we map that
+		// directory so that getPageInfo sees it as /target.
+		const target = "/target"
+		const cmdPrefix = "cmd/"
+		path := flag.Arg(0)
+		var forceCmd bool
+		var abspath, relpath string
+		if filepath.IsAbs(path) {
+			fs.Bind(target, OS(path), "/", bindReplace)
+			abspath = target
+		} else if build.IsLocalImport(path) {
+			cwd, _ := os.Getwd() // ignore errors
+			path = filepath.Join(cwd, path)
+			fs.Bind(target, OS(path), "/", bindReplace)
+			abspath = target
+		} else if strings.HasPrefix(path, cmdPrefix) {
+			path = path[len(cmdPrefix):]
+			forceCmd = true
+		} else if bp, _ := build.Import(path, "", build.FindOnly); bp.Dir != "" && bp.ImportPath != "" {
+			fs.Bind(target, OS(bp.Dir), "/", bindReplace)
+			abspath = target
+			relpath = bp.ImportPath
+		} else {
+			abspath = pathpkg.Join(pkgHandler.fsRoot, path)
+		}
+		if relpath == "" {
+			relpath = abspath
+		}
 */
 func buildImport(target string) (*build.Package, error) {
 	if filepath.IsAbs(target) {
@@ -616,7 +616,7 @@ func loadTemplate(document *_document) *Template.Template {
 }
 
 func (self *_document) Badge() string {
-	return "[![GoDocDown](https://img.shields.io/badge/docs-generated-blue.svg?longCache=true)](https://github.com/avinoamr/godocdown)"
+	return "[![GoDocDown](https://img.shields.io/badge/docs-generated-blue.svg?longCache=true)](https://github.com/aschey/godocdown)"
 }
 
 func (*_document) ToCode(code string) string {
