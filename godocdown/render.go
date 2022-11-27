@@ -30,7 +30,7 @@ func renderFunctionSectionTo(writer io.Writer, list []*doc.Func, inTypeSection b
 		if entry.Recv != "" {
 			receiver = fmt.Sprintf("(%s) ", entry.Recv)
 		}
-		fmt.Fprintf(writer, "%s func %s%s() {#%s}\n\n%s\n%s\n",
+		fmt.Fprintf(writer, "%s func %s%s {#%s}\n\n%s\n%s\n",
 			header,
 			receiver,
 			entry.Name,
@@ -61,7 +61,7 @@ func renderTypeSectionTo(writer io.Writer, list []*doc.Type, exs []*doc.Example)
 	header := RenderStyle.TypeHeader
 
 	for _, entry := range list {
-		fmt.Fprintf(writer, "%s type %s() {#%s}\n\n%s\n\n%s\n",
+		fmt.Fprintf(writer, "%s type %s {#%s}\n\n%s\n\n%s\n",
 			header,
 			entry.Name,
 			entry.Name,
