@@ -157,16 +157,16 @@ var (
 var DefaultStyle = Style{
 	IncludeImport: true,
 
-	SynopsisHeader:  "###",
+	SynopsisHeader:  "####",
 	SynopsisHeading: synopsisHeadingTitleCase1Word_Regexp,
 
-	UsageHeader: "## Index\n",
+	UsageHeader: "#### Index\n",
 
-	ConstantHeader:     "##",
-	VariableHeader:     "##",
-	FunctionHeader:     "##",
-	TypeHeader:         "##",
-	TypeFunctionHeader: "##",
+	ConstantHeader:     "####",
+	VariableHeader:     "####",
+	FunctionHeader:     "####",
+	TypeHeader:         "####",
+	TypeFunctionHeader: "####",
 
 	IncludeSignature: false,
 }
