@@ -102,7 +102,6 @@ import (
 	Flag "flag"
 	"fmt"
 	"go/ast"
-	"go/build"
 	"go/doc"
 	"go/parser"
 	"go/printer"
@@ -117,6 +116,7 @@ import (
 	Time "time"
 
 	"github.com/lithammer/dedent"
+	"golang.org/x/mod/modfile"
 )
 
 const (
@@ -208,7 +208,7 @@ type Style struct {
 type _document struct {
 	Name       string
 	pkg        *doc.Package
-	buildPkg   *build.Package
+	absPath    string
 	testFiles  map[string]*ast.File
 	IsCommand  bool
 	ImportPath string
@@ -365,38 +365,48 @@ func exampleSubName(name string) string {
 			relpath = abspath
 		}
 */
-func buildImport(target string) (*build.Package, error) {
+func buildImport(target string) (string, string, error) {
 	cwd, err := os.Getwd()
 	if err != nil {
-		return nil, err
+		return "", "", err
 	}
 
-	ctx := build.Default
-	ctx.Dir = cwd
-
+	relPath := target
 	absPath := target
-	if !filepath.IsAbs(target) {
+	if filepath.IsAbs(target) {
+		relPath, err = filepath.Rel(cwd, target) // filepath.Join(cwd, target)
+		if err != nil {
+			return "", "", err
+		}
+	} else {
 		absPath = filepath.Join(cwd, target)
 	}
 
-	return ctx.Import(absPath, ctx.Dir, build.FindOnly)
+	modPath := filepath.Join(cwd, "go.mod")
+	modContents, err := os.ReadFile(modPath)
+	if err != nil {
+		return "", "", err
+	}
+	modFile, err := modfile.Parse("go.mod", modContents, nil)
+	if err != nil {
+		return "", "", err
+	}
+	modName := modFile.Module.Mod.Path
+	importPath := filepath.Join(modName, relPath)
+
+	return importPath, absPath, err
 
 }
 
 func loadDocument(target string) (*_document, error) {
 
-	buildPkg, err := buildImport(target)
+	importPath, absPath, err := buildImport(target)
 	if err != nil {
 		return nil, err
 	}
-	if buildPkg.Dir == "" {
-		return nil, fmt.Errorf("Could not find package \"%s\"", target)
-	}
-
-	path := buildPkg.Dir
 
 	fset = token.NewFileSet()
-	pkgSet, err := parser.ParseDir(fset, path, func(file os.FileInfo) bool {
+	pkgSet, err := parser.ParseDir(fset, absPath, func(file os.FileInfo) bool {
 		name := file.Name()
 		if name[0] != '.' && strings.HasSuffix(name, ".go") { //} && !strings.HasSuffix(name, "_test.go") {
 			return true
@@ -404,14 +414,11 @@ func loadDocument(target string) (*_document, error) {
 		return false
 	}, parser.ParseComments)
 	if err != nil {
-		return nil, fmt.Errorf("Could not parse \"%s\": %v", path, err)
+		return nil, fmt.Errorf("Could not parse \"%s\": %v", absPath, err)
 	}
 
-	importPath := ""
-	if read, err := ioutil.ReadFile(filepath.Join(path, ".godocdown.import")); err == nil {
+	if read, err := ioutil.ReadFile(filepath.Join(absPath, ".godocdown.import")); err == nil {
 		importPath = strings.TrimSpace(strings.Split(string(read), "\n")[0])
-	} else {
-		importPath = buildPkg.ImportPath
 	}
 
 	{
@@ -446,11 +453,8 @@ func loadDocument(target string) (*_document, error) {
 				// We're a command, this package/file contains the documentation
 				// path is used to get the containing directory in the case of
 				// command documentation
-				path, err := filepath.Abs(path)
-				if err != nil {
-					panic(err)
-				}
-				_, name = filepath.Split(path)
+
+				_, name = filepath.Split(absPath)
 				isCommand = true
 				pkg = tmpPkg
 			default:
@@ -473,7 +477,7 @@ func loadDocument(target string) (*_document, error) {
 			return &_document{
 				Name:       name,
 				pkg:        pkg,
-				buildPkg:   buildPkg,
+				absPath:    absPath,
 				testFiles:  testFiles,
 				IsCommand:  isCommand,
 				ImportPath: importPath,
@@ -592,7 +596,7 @@ func loadTemplate(document *_document) *Template.Template {
 
 	templatePath := *flag_template
 	if templatePath == "" {
-		templatePath = findTemplate(document.buildPkg.Dir)
+		templatePath = findTemplate(document.absPath)
 	}
 
 	if templatePath == "" {
