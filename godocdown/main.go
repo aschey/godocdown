@@ -366,28 +366,21 @@ func exampleSubName(name string) string {
 		}
 */
 func buildImport(target string) (*build.Package, error) {
-	if filepath.IsAbs(target) {
-		return build.Default.ImportDir(target, build.FindOnly)
-	} else if build.IsLocalImport(target) {
-		base, _ := os.Getwd()
-		path := filepath.Join(base, target)
-		return build.Default.ImportDir(path, build.FindOnly)
-	} else if pkg, _ := build.Default.Import(target, "", build.FindOnly); pkg.Dir != "" && pkg.ImportPath != "" {
-		return pkg, nil
-	}
-	path, _ := filepath.Abs(target) // Even if there is an error, still try?
-	return build.Default.ImportDir(path, build.FindOnly)
-}
-
-func guessImportPath(target string) (string, error) {
-	buildPkg, err := buildImport(target)
+	cwd, err := os.Getwd()
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	if buildPkg.SrcRoot == "" {
-		return "", nil
+
+	ctx := build.Default
+	ctx.Dir = cwd
+
+	absPath := target
+	if !filepath.IsAbs(target) {
+		absPath = filepath.Join(cwd, target)
 	}
-	return buildPkg.ImportPath, nil
+
+	return ctx.Import(absPath, ctx.Dir, build.FindOnly)
+
 }
 
 func loadDocument(target string) (*_document, error) {
