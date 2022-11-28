@@ -392,7 +392,8 @@ func buildImport(target string) (string, string, error) {
 		return "", "", err
 	}
 	modName := modFile.Module.Mod.Path
-	importPath := filepath.Join(modName, relPath)
+	// Ensure we use forward slashes on windows
+	importPath := strings.ReplaceAll(filepath.Join(modName, relPath), "\\", "/")
 
 	return importPath, absPath, err
 
